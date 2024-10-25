@@ -1,5 +1,13 @@
 import json
 from llama_index.core.llms import ChatMessage
+import os
+
+def create_dir():
+    directories = ["./data", "./db", "./img"]
+
+    for directory in directories:
+        if not os.path.exists(directory):
+            os.makedirs(directory)
 
 async def stream_response(llm, query: str):
     messages = [

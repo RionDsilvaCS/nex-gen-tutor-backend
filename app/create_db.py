@@ -9,6 +9,17 @@ import Stemmer
 import os
 import chromadb
 
+def delete_files_in_directory(directory_path: str):
+    try:
+        for filename in os.listdir(directory_path):
+            file_path = os.path.join(directory_path, filename)
+            if os.path.isfile(file_path):
+                os.remove(file_path)
+        print("All files deleted successfully.")
+    except OSError as e:
+        print(f"Error occurred: {e}")
+
+
 def save_chromadb(nodes: list, 
                   db_name: str, 
                   collection_name: str = "default", 
@@ -17,7 +28,7 @@ def save_chromadb(nodes: list,
     print("-:-:-:- ChromaDB [Vector Database] creating ... -:-:-:-")
 
     # Embedding Model
-    embed_model = HuggingFaceEmbedding(model_name="BAAI/bge-base-en-v1.5")
+    embed_model = HuggingFaceEmbedding(model_name="BAAI/bge-small-en-v1.5")
 
     # Path to save the database file
     save_pth = os.path.join(save_dir, db_name)
@@ -48,7 +59,7 @@ def save_BM25(nodes: list,
     # Initializing BM25
     bm25_retriever = BM25Retriever.from_defaults(
         nodes=nodes,
-        similarity_top_k=24,
+        similarity_top_k=8,
         stemmer=Stemmer.Stemmer("english"),
         language="english",
     )
@@ -60,6 +71,7 @@ def save_BM25(nodes: list,
     bm25_retriever.persist(save_pth)
 
     print("-:-:-:- BM25 [TF_IDF Database] saved -:-:-:-")
+
 
 def create_and_save_db(
         data_dir: str, 
@@ -107,3 +119,5 @@ def create_and_save_db(
     save_BM25(nodes=nodes, 
               save_dir=save_dir, 
               db_name=bm25db_name)
+    
+    delete_files_in_directory(DATA_DIR)

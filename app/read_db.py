@@ -13,16 +13,16 @@ from dotenv import load_dotenv
 load_dotenv()
 
 class SemanticBM25Retriever(BaseRetriever):
-    def __init__(self, collection_name: str = "default", mode: str = "OR") -> None:
+    def __init__(self, db_name: str, collection_name: str = "default", mode: str = "OR") -> None:
 
         self._mode = mode
 
         # Path to database directories
-        VECTOR_DB_PATH = os.getenv("VECTOR_DB_PATH")
-        BM25_DB_PATH = os.getenv("BM25_DB_PATH")
+        VECTOR_DB_PATH = os.path.join(os.getenv("VECTOR_DB_PATH"), f'{db_name}_vectordb')
+        BM25_DB_PATH = os.path.join(os.getenv("BM25_DB_PATH"), f'{db_name}_bm25')
 
         # Embedding Model
-        self._embed_model = HuggingFaceEmbedding(model_name="BAAI/bge-base-en-v1.5")
+        self._embed_model = HuggingFaceEmbedding(model_name="BAAI/bge-small-en-v1.5")
 
         # Read stored Vector Database
         self._vectordb = chromadb.PersistentClient(path=VECTOR_DB_PATH)
@@ -63,9 +63,9 @@ class SemanticBM25Retriever(BaseRetriever):
 
 if __name__ == "__main__":
 
-    db = SemanticBM25Retriever(collection_name="collection_name")
+    db = SemanticBM25Retriever(collection_name="jax")
 
-    res = db.retrieve("List of all sandwich recipes.")
+    res = db.retrieve("what are Code generation flags ?")
 
     print(len(res))
 
